@@ -8,36 +8,84 @@
 	to		=	0;			% Initial Time, sec
 	tf		=	6;			% Final Time, sec
 	tspan	=	[to tf];
+    VMIN    =   2;
+    VMAX    =   7.5;
+    GamMIN  =   -0.5;
+    GamMAX  =   0.4;
+
 	xo		=	[V;Gam;H;R];
-	[ta,xa]	=	ode23('EqMotion',tspan,xo);
-	
-%	b) Oscillating Glide due to Zero Initial Flight Path Angle
-	xo		=	[V;0;H;R];
-	[tb,xb]	=	ode23('EqMotion',tspan,xo);
+	[tv1,xv1]	=	ode23('EqMotion',tspan,xo);
+    xo      =   [VMIN;Gam;H;R];
+    [tv2,xv2] =   ode23('EqMotion',tspan,xo);
+    xo      =   [VMAX;Gam;H;R];
+    [tv3,xv3] =   ode23('EqMotion',tspan,xo);
 
-%	c) Effect of Increased Initial Velocity
-	xo		=	[1.5*V;0;H;R];
-	[tc,xc]	=	ode23('EqMotion',tspan,xo);
+    xo		=	[V;Gam;H;R];
+	[tf1,xf1]	=	ode23('EqMotion',tspan,xo);
+    xo      =   [V;GamMIN;H;R];
+    [tf2,xf2] =   ode23('EqMotion',tspan,xo);
+    xo      =   [V;GamMAX;H;R];
+    [tf3,xf3] =   ode23('EqMotion',tspan,xo);
 
-%	d) Effect of Further Increase in Initial Velocity
-	xo		=	[3*V;0;H;R];
-	[td,xd]	=	ode23('EqMotion',tspan,xo);
 	
-	figure
-	plot(xa(:,4),xa(:,3),xb(:,4),xb(:,3),xc(:,4),xc(:,3),xd(:,4),xd(:,3))
+    tiledlayout(2,1)
+    nexttile
+	plot(xv1(:,4),xv1(:,3),'k',xv2(:,4),xv2(:,3),'r',xv3(:,4),xv3(:,3),'g')
 	xlabel('Range, m'), ylabel('Height, m'), grid
-   
+    title('Trajectory, Varying Initial Velocity');
+    legend('Nominal', 'Lower', 'Higher');
+    hold on; nexttile;
+    plot(xf1(:,4),xf1(:,3),'k',xf2(:,4),xf2(:,3),'r',xf3(:,4),xf3(:,3),'g')
+    xlabel('Range, m'), ylabel('Height, m'), grid
+    title('Trajectory, Varying Initial Flight Path Angle')
+    legend('Nominal', 'Lower', 'Higher');
+    
 
-	figure
-	subplot(2,2,1)
-	plot(ta,xa(:,1),tb,xb(:,1),tc,xc(:,1),td,xd(:,1))
-	xlabel('Time, s'), ylabel('Velocity, m/s'), grid
-	subplot(2,2,2)
-	plot(ta,xa(:,2),tb,xb(:,2),tc,xc(:,2),td,xd(:,2))
-	xlabel('Time, s'), ylabel('Flight Path Angle, rad'), grid
-	subplot(2,2,3)
-	plot(ta,xa(:,3),tb,xb(:,3),tc,xc(:,3),td,xd(:,3))
-	xlabel('Time, s'), ylabel('Altitude, m'), grid
-	subplot(2,2,4)
-	plot(ta,xa(:,4),tb,xb(:,4),tc,xc(:,4),td,xd(:,4))
-	xlabel('Time, s'), ylabel('Range, m'), grid
+    figure
+    tspan = (to:0.08:tf);
+    range = zeros(76,100);
+    height = zeros(76,100);
+    time = zeros(76,100);
+    for i = 1:100
+        V(i) = VMIN + (VMAX-VMIN)*rand(1);
+        Gam(i) = GamMIN + (GamMAX-GamMIN)*rand(1);
+        xo		=	[V(i);Gam(i);H;R];
+	    [t,x]	=	ode23('EqMotion',tspan,xo);
+        plot(x(:,4),x(:,3), 'Color',[0 0 1 0.3]);
+        hold on
+        range(:,i) = x(:,4);
+        height(:,i) = x(:,3);
+        time(:,i) = tspan;
+    end
+  
+    p = polyfit(time,range,10);
+    range_fit = polyval(p, time);
+
+    q = polyfit(time,height,10);
+    height_fit = polyval(q, time);
+
+    fit = plot(range_fit, height_fit, 'Color', [1 0.2 0 1], LineWidth=3);
+    legend(fit, 'Polynomial Fit');
+    xlim([0 22])
+    xlabel('Range, m'), ylabel('Height, m');
+    title('Trajectories, Randomly Varying Velocity and Flight Path Angle')
+
+    dp = zeros(1, 10);
+    dq = zeros(1, 10);
+    for i = 1:10
+        dp(i) = p(i)*(11-i);
+        dq(i) = q(i)*(11-i);
+    end
+
+    figure
+    tiledlayout(2,1)
+    nexttile
+    drange = polyval(dp, time);
+    plot(time,drange);
+    xlabel('Time, s'), ylabel('dRange, m/s'), title('Time Derivative of Range')
+    nexttile
+    dheight = polyval(dq, time);
+    plot(time,dheight);
+    xlabel('Time, s'), ylabel('dHeight, m/s'), title('Time Derivative of Height')
+
+
