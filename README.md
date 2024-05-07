@@ -4,40 +4,29 @@
   - By: Landen Kranz
 
   ## Summary of Findings
-  <Show the variations studied in a table>
 
-  Summarized what was accomplished in this study.  Describe 2-4 observations from simulating the flight path.
-  Reference the figures below as needed.
-
-  *If the analysis falls short of the goal, this is your chance to explain what was done or what were the barriers.*
+  This study was conducted to learn more about the flight properties of a glider by using paper airplane simulator. Height vs Range graphs were plotted to show the trajectory of the plane. The intitial velocity and flight path angle were adjusted to see how they affected trajectory. As shown in figure one, it seems that increasing the starting velocity results in the overall range of the airplane increasing. Varying the flight path angle didn't seem to affect the trajectory significantly.
  
   # Code Listing
-  A list of each function/script and a single-line description of what it does.  The name of the function/script should link to the file in the repository on GitHub.
-
+ 
+  - PaperPlane.m - This main script runs all the functions and plots the figures.
+  - EqMotion.m - This function finds the equation of motion to be used in ode23.
+  - setup_sim.m - This function sets up the simulation by assigning values to all of the properties and parameters of the airplane.
+  
   # Figures
 
   ## Fig. 1: Single Parameter Variation
-  <2D trajectory simulated by varying single parameter at at time>
-  <The above plot should also show the nominal trajectory>
+  ![figure1](https://github.com/landenkranz/aem3103-final/assets/167818361/c1446faa-e04d-4797-a16f-af581727e5e2)
 
-  Briefly describe what is being shown in the figure.
+  This figure shows the trajectory of the airplane while varying a single parameter. The top plot varies initial velocity and the bottom plot varies flight path angle. The plots depict the nominal value, an upper limit value and a lower limit value.
 
   ## Fig. 2: Monte Carlo Simulation
-  <2D trajectories simulated using random sampling of parameters, overlay polynomial fit onto plot.>
+  ![figure2](https://github.com/landenkranz/aem3103-final/assets/167818361/2cf5d940-a806-42c0-b652-666c5ae304ec)
 
-  Briefly describe what is being shown in the figure.
+  This figure shows 100 runs of random parameters for initial velocity and flight path angle between the upper and lower limits. The red line is a 10th order polynomial fit to the data that represents an average trajectory.
 
  ## Fig. 3: Time Derivatives
- <Time-derivative of height and range for the fitted trajectory>
+ ![figure3](https://github.com/landenkranz/aem3103-final/assets/167818361/236e2fca-66e7-4512-909a-4a9a7a69bc92)
 
-  Briefly describe what is being shown in the figure.
+ This figure shows the time derivatives of both the range and the height of the airplane. It also represents the velocity in the horizontal and vertical direction as a function of time.
 
-  (Below are for teams of 2-3 people)
-
-  # Animation
-  ## Point-Mass Animation
-  <Animated GIF showing 2D trajectory for nominal and the scenario (V=7.5 m/s, Gam=+0.4 rad)>
-  
-  (Below are for teams of 3 people)
-  ## Graphical Animation
-  <Same as the above animation, except that the moving *point* should be a 2D drawing of an airplane, drawn using CAD>
